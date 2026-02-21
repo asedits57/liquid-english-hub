@@ -1,12 +1,24 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import Navbar from "@/components/Navbar";
+import HeroSection from "@/components/HeroSection";
+import LearningSection from "@/components/LearningSection";
+import TaskLevels from "@/components/TaskLevels";
+import DailyChallenge from "@/components/DailyChallenge";
+import StatsPanel from "@/components/StatsPanel";
 
 const Index = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen animated-bg relative">
+      <Navbar />
+      <HeroSection />
+      <DailyChallenge />
+      <LearningSection />
+      <TaskLevels />
+      <StatsPanel />
+      <footer className="glass-strong border-t border-border/50 py-8 mt-8">
+        <div className="container mx-auto px-6 text-center text-sm text-muted-foreground">
+          © 2026 FluentAI — AI-Powered English Learning Platform
+        </div>
+      </footer>
     </div>
   );
 };
