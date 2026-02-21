@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from "react";
 import { ArrowLeft, ArrowRight, CheckCircle, XCircle, Volume2, RotateCcw, Clock, Trophy, Zap } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 type Question = {
   id: number;
@@ -15,9 +15,63 @@ type Question = {
   explanation: string;
 };
 
-const questions: Question[] = [
+const allQuestions: Question[] = [
+  // ── Beginner ──
   {
     id: 1,
+    type: "multiple-choice",
+    category: "Grammar",
+    difficulty: "Beginner",
+    question: 'Choose the correct form: "She _____ to school every day."',
+    options: ["go", "goes", "going", "gone"],
+    correctAnswer: "goes",
+    explanation: "Third-person singular present tense requires 'goes'.",
+  },
+  {
+    id: 2,
+    type: "fill-blank",
+    category: "Vocabulary",
+    difficulty: "Beginner",
+    question: '"The opposite of hot is _____."',
+    correctAnswer: "cold",
+    blanks: ["cold", "warm", "cool"],
+    explanation: "'Cold' is the direct antonym of 'hot'.",
+  },
+  {
+    id: 3,
+    type: "multiple-choice",
+    category: "Reading",
+    difficulty: "Beginner",
+    question: 'What does the word "happy" mean?',
+    options: ["Sad", "Feeling pleasure", "Angry", "Tired"],
+    correctAnswer: "Feeling pleasure",
+    explanation: "'Happy' means feeling or showing pleasure or contentment.",
+  },
+  {
+    id: 4,
+    type: "audio",
+    category: "Listening",
+    difficulty: "Beginner",
+    question: "Listen and choose what the speaker is talking about:",
+    audioText: "I wake up at seven o'clock every morning. I eat breakfast, brush my teeth, and then I walk to school. My favorite subject is science.",
+    options: ["A weekend trip", "A daily morning routine", "A cooking recipe", "A sports event"],
+    correctAnswer: "A daily morning routine",
+    explanation: "The speaker describes waking up, eating breakfast, and going to school — a daily routine.",
+  },
+  {
+    id: 5,
+    type: "fill-blank",
+    category: "Grammar",
+    difficulty: "Beginner",
+    question: '"They _____ playing football in the park right now."',
+    correctAnswer: "are",
+    blanks: ["are", "is", "was"],
+    explanation: "'They' takes the plural auxiliary 'are' in present continuous.",
+  },
+
+  // ── Intermediate ──
+  {
+    id: 6,
     type: "multiple-choice",
     category: "Grammar",
     difficulty: "Intermediate",
@@ -32,17 +86,17 @@ const questions: Question[] = [
     explanation: "With third-person singular subjects, we use 'doesn't' + base form of the verb.",
   },
   {
-    id: 2,
+    id: 7,
     type: "fill-blank",
-    category: "Vocabulary",
-    difficulty: "Advanced",
-    question: 'Complete the sentence: "The scientist\'s groundbreaking research had a profound _____ on the field of genetics."',
-    correctAnswer: "impact",
-    blanks: ["impact", "effect", "influence"],
-    explanation: "'Impact' collocates naturally with 'profound' and 'on the field' in academic contexts.",
+    category: "Grammar",
+    difficulty: "Intermediate",
+    question: '"If I _____ known about the meeting, I would have attended."',
+    correctAnswer: "had",
+    blanks: ["had", "have", "has"],
+    explanation: "Third conditional (past unreal condition) requires 'had' + past participle.",
   },
   {
-    id: 3,
+    id: 8,
     type: "audio",
     category: "Listening",
     difficulty: "Intermediate",
@@ -58,27 +112,39 @@ const questions: Question[] = [
     explanation: "The passage emphasizes the urgency of climate change and the need for immediate action.",
   },
   {
-    id: 4,
+    id: 9,
     type: "multiple-choice",
-    category: "Reading",
-    difficulty: "Beginner",
-    question: 'What does the word "ubiquitous" most closely mean?',
-    options: ["Rare and unusual", "Found everywhere", "Extremely dangerous", "Highly valuable"],
-    correctAnswer: "Found everywhere",
-    explanation: "'Ubiquitous' means present, appearing, or found everywhere.",
-  },
-  {
-    id: 5,
-    type: "fill-blank",
-    category: "Grammar",
+    category: "Vocabulary",
     difficulty: "Intermediate",
-    question: '"If I _____ known about the meeting, I would have attended."',
-    correctAnswer: "had",
-    blanks: ["had", "have", "has"],
-    explanation: "This is a third conditional sentence (past unreal condition), requiring 'had' + past participle.",
+    question: '"The new policy was met with widespread _____." Choose the best word:',
+    options: ["Approval", "Ignorance", "Hostility", "Confusion"],
+    correctAnswer: "Approval",
+    explanation: "'Widespread approval' is a common collocation meaning general acceptance.",
   },
   {
-    id: 6,
+    id: 10,
+    type: "fill-blank",
+    category: "Reading",
+    difficulty: "Intermediate",
+    question: '"Despite the heavy rain, the team _____ to complete the project on time."',
+    correctAnswer: "managed",
+    blanks: ["managed", "failed", "refused"],
+    explanation: "'Managed to' indicates successfully doing something difficult.",
+  },
+
+  // ── Advanced ──
+  {
+    id: 11,
+    type: "fill-blank",
+    category: "Vocabulary",
+    difficulty: "Advanced",
+    question: '"The scientist\'s groundbreaking research had a profound _____ on the field of genetics."',
+    correctAnswer: "impact",
+    blanks: ["impact", "effect", "influence"],
+    explanation: "'Impact' collocates naturally with 'profound' and 'on the field' in academic contexts.",
+  },
+  {
+    id: 12,
     type: "audio",
     category: "Listening",
     difficulty: "Advanced",
@@ -89,17 +155,54 @@ const questions: Question[] = [
     explanation: "The use of 'absolutely remarkable' paired with criticism indicates sarcasm and frustration.",
   },
   {
-    id: 7,
+    id: 13,
+    type: "multiple-choice",
+    category: "Reading",
+    difficulty: "Advanced",
+    question: '"The author\'s use of juxtaposition in the passage primarily serves to:"',
+    options: [
+      "Introduce a new character",
+      "Highlight contrasting ideas for emphasis",
+      "Provide comic relief",
+      "Summarize the main argument",
+    ],
+    correctAnswer: "Highlight contrasting ideas for emphasis",
+    explanation: "Juxtaposition is a literary device used to place contrasting elements side by side for emphasis.",
+  },
+  {
+    id: 14,
+    type: "fill-blank",
+    category: "Grammar",
+    difficulty: "Advanced",
+    question: '"Had the committee _____ the proposal earlier, the outcome might have been different."',
+    correctAnswer: "reviewed",
+    blanks: ["reviewed", "reviewing", "review"],
+    explanation: "Inverted third conditional: 'Had + subject + past participle' replaces 'If + had'.",
+  },
+  {
+    id: 15,
+    type: "multiple-choice",
+    category: "Vocabulary",
+    difficulty: "Advanced",
+    question: 'Which word means "to make something less severe"?',
+    options: ["Exacerbate", "Mitigate", "Proliferate", "Corroborate"],
+    correctAnswer: "Mitigate",
+    explanation: "'Mitigate' means to make less severe, serious, or painful.",
+  },
+
+  // ── Expert ──
+  {
+    id: 16,
     type: "multiple-choice",
     category: "Vocabulary",
     difficulty: "Expert",
-    question: 'Choose the word that best completes: "The politician\'s _____ remarks alienated even her closest allies."',
+    question: '"The politician\'s _____ remarks alienated even her closest allies."',
     options: ["Eloquent", "Incendiary", "Mundane", "Benevolent"],
     correctAnswer: "Incendiary",
     explanation: "'Incendiary' means inflammatory or provocative — fitting for remarks that alienate allies.",
   },
   {
-    id: 8,
+    id: 17,
     type: "fill-blank",
     category: "Grammar",
     difficulty: "Expert",
@@ -107,6 +210,47 @@ const questions: Question[] = [
     correctAnswer: "did she pass",
     blanks: ["did she pass", "she passed", "she did pass"],
     explanation: "'Not only' at the start of a sentence triggers subject-auxiliary inversion.",
+  },
+  {
+    id: 18,
+    type: "audio",
+    category: "Listening",
+    difficulty: "Expert",
+    question: "Listen carefully and determine the logical flaw in the argument:",
+    audioText: "Every successful entrepreneur I've met wakes up before five AM. Therefore, waking up early is the key to entrepreneurial success. If you want to build a great company, you must adopt this habit immediately.",
+    options: [
+      "Appeal to authority",
+      "Correlation mistaken for causation",
+      "Straw man argument",
+      "Ad hominem attack",
+    ],
+    correctAnswer: "Correlation mistaken for causation",
+    explanation: "The speaker assumes that because successful entrepreneurs wake up early, early rising causes success — a classic correlation/causation fallacy.",
+  },
+  {
+    id: 19,
+    type: "multiple-choice",
+    category: "Reading",
+    difficulty: "Expert",
+    question: '"In the context of postcolonial literature, the concept of \'hybridity\' primarily refers to:"',
+    options: [
+      "The blending of genetic traits in organisms",
+      "The mixing of cultural identities and practices",
+      "The combination of different literary genres",
+      "The merging of historical timelines in narratives",
+    ],
+    correctAnswer: "The mixing of cultural identities and practices",
+    explanation: "In postcolonial theory, 'hybridity' (Homi Bhabha) refers to the creation of new cultural forms through the mixing of colonizer and colonized cultures.",
+  },
+  {
+    id: 20,
+    type: "fill-blank",
+    category: "Vocabulary",
+    difficulty: "Expert",
+    question: '"The philosopher\'s _____ argument left even seasoned academics struggling to find counterpoints."',
+    correctAnswer: "cogent",
+    blanks: ["cogent", "specious", "tepid"],
+    explanation: "'Cogent' means clear, logical, and convincing — appropriate for an argument that is hard to counter.",
   },
 ];
 
@@ -117,8 +261,20 @@ const difficultyColor: Record<string, string> = {
   Expert: "text-glow-violet",
 };
 
+const levelLabels: Record<string, string> = {
+  beginner: "Beginner",
+  intermediate: "Intermediate",
+  advanced: "Advanced",
+  expert: "Expert",
+};
+
 const PracticeTest = () => {
   const navigate = useNavigate();
+  const { level } = useParams<{ level: string }>();
+
+  const levelLabel = level ? levelLabels[level] || "Beginner" : "Beginner";
+  const questions = allQuestions.filter((q) => q.difficulty === levelLabel);
+
   const [currentIdx, setCurrentIdx] = useState(0);
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [showResult, setShowResult] = useState<Record<number, boolean>>({});
@@ -134,15 +290,15 @@ const PracticeTest = () => {
 
   const submitAnswer = useCallback(
     (ans: string) => {
-      if (showResult[q.id]) return;
+      if (!q || showResult[q.id]) return;
       setAnswers((prev) => ({ ...prev, [q.id]: ans }));
       setShowResult((prev) => ({ ...prev, [q.id]: true }));
     },
-    [q.id, showResult]
+    [q, showResult]
   );
 
   const playAudio = useCallback(() => {
-    if (!q.audioText) return;
+    if (!q?.audioText) return;
     synthRef.current.cancel();
     const u = new SpeechSynthesisUtterance(q.audioText);
     u.rate = 0.9;
@@ -164,6 +320,20 @@ const PracticeTest = () => {
     }
   };
 
+  if (!q) {
+    return (
+      <div className="min-h-screen animated-bg flex items-center justify-center">
+        <div className="glass rounded-2xl p-10 text-center glow-border-cyan">
+          <h2 className="font-display text-2xl font-bold mb-3">No questions available</h2>
+          <p className="text-muted-foreground mb-6">No tasks found for this level.</p>
+          <button onClick={() => navigate("/")} className="rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground">
+            Back to Dashboard
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   const isCorrect = answers[q.id] === q.correctAnswer;
   const answered = showResult[q.id];
 
@@ -184,6 +354,9 @@ const PracticeTest = () => {
             Back to Dashboard
           </button>
           <div className="flex items-center gap-4">
+            <div className={`glass rounded-full px-3 py-1.5 ${difficultyColor[levelLabel]}`}>
+              <span className="text-xs font-semibold">{levelLabel}</span>
+            </div>
             <div className="flex items-center gap-2 glass rounded-full px-3 py-1.5">
               <Clock className="h-3.5 w-3.5 text-muted-foreground" />
               <span className="text-xs font-medium text-muted-foreground">
@@ -404,7 +577,7 @@ const PracticeTest = () => {
               {correctCount} / {questions.length}
             </p>
             <p className="text-muted-foreground mb-6">
-              {correctCount >= 6 ? "Excellent work!" : correctCount >= 4 ? "Good effort, keep practicing!" : "Keep going — practice makes perfect!"}
+              {correctCount >= Math.ceil(questions.length * 0.8) ? "Excellent work!" : correctCount >= Math.ceil(questions.length * 0.5) ? "Good effort, keep practicing!" : "Keep going — practice makes perfect!"}
             </p>
             <div className="flex justify-center gap-4">
               <button

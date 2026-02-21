@@ -1,39 +1,44 @@
 import { Star, Lock, CheckCircle, ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const levels = [
   {
     level: "Beginner",
+    slug: "beginner",
     score: "10–55",
     description: "Build your foundation with basic vocabulary and simple sentence structures",
     progress: 85,
-    status: "completed" as const,
+    status: "completed" as const as "completed" | "active" | "locked",
     tasks: 12,
     color: "cyan" as const,
   },
   {
     level: "Intermediate",
+    slug: "intermediate",
     score: "60–90",
     description: "Strengthen comprehension and develop more complex language skills",
     progress: 42,
-    status: "active" as const,
+    status: "active" as const as "completed" | "active" | "locked",
     tasks: 18,
     color: "blue" as const,
   },
   {
     level: "Advanced",
+    slug: "advanced",
     score: "95–120",
     description: "Refine fluency with academic texts, nuanced writing, and fast-paced listening",
     progress: 0,
-    status: "locked" as const,
+    status: "active" as const as "completed" | "active" | "locked",
     tasks: 24,
     color: "violet" as const,
   },
   {
     level: "Expert",
+    slug: "expert",
     score: "125–160",
     description: "Master high-level reasoning, argumentation, and native-like proficiency",
     progress: 0,
-    status: "locked" as const,
+    status: "active" as const as "completed" | "active" | "locked",
     tasks: 16,
     color: "violet" as const,
   },
@@ -52,6 +57,8 @@ const barMap = {
 };
 
 const TaskLevels = () => {
+  const navigate = useNavigate();
+
   return (
     <section className="py-16 relative">
       <div className="container mx-auto px-6">
@@ -64,6 +71,7 @@ const TaskLevels = () => {
           {levels.map((lvl, i) => (
             <div
               key={lvl.level}
+              onClick={() => lvl.status !== "locked" && navigate(`/practice/${lvl.slug}`)}
               className={`glass rounded-2xl p-6 liquid-hover transition-all duration-500 group animate-fade-in ${borderMap[lvl.color]} ${lvl.status === "locked" ? "opacity-60" : "hover:scale-[1.01] cursor-pointer"}`}
               style={{ animationDelay: `${i * 0.1}s` }}
             >
@@ -103,7 +111,7 @@ const TaskLevels = () => {
 
               {lvl.status !== "locked" && (
                 <button className="flex items-center gap-1.5 text-sm font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  {lvl.status === "completed" ? "Review" : "Continue"}
+                  {lvl.status === "completed" ? "Review" : "Start Practice"}
                   <ArrowRight className="h-3.5 w-3.5" />
                 </button>
               )}
