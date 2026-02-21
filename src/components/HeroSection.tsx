@@ -1,6 +1,8 @@
 import { ArrowRight, Sparkles } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const HeroSection = () => {
+  const navigate = useNavigate();
   return (
     <section className="relative py-16 md:py-24 overflow-hidden">
       {/* Orbs */}
@@ -26,7 +28,7 @@ const HeroSection = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in" style={{ animationDelay: "0.3s" }}>
-            <button className="group flex items-center gap-2 rounded-xl bg-primary px-6 py-3 font-semibold text-primary-foreground transition-all duration-300 hover:shadow-[0_0_30px_hsla(185,100%,50%,0.3)] hover:scale-105">
+            <button onClick={() => navigate("/practice")} className="group flex items-center gap-2 rounded-xl bg-primary px-6 py-3 font-semibold text-primary-foreground transition-all duration-300 hover:shadow-[0_0_30px_hsla(185,100%,50%,0.3)] hover:scale-105">
               Start Practicing
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </button>
